@@ -1,0 +1,16 @@
+{
+    "name": "ToonRP Editor",
+    "rootNamespace": "ToonRP.Editor",
+    "references": [
+        "GUID:922a027b3f164e34eab50c876c1962e7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
