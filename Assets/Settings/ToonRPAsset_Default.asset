@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be918fe689705764eb8377c0e5da9356, type: 3}
   m_Name: ToonRPAsset_Default
   m_EditorClassIdentifier: ToonRP::ToonRP.ToonRPAsset
+  pipelineName: ToonRenderPipeline
+  useSrpBatcher: 1
