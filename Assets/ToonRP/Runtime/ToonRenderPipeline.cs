@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ToonRP.FrameData;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -16,7 +15,7 @@ namespace ToonRP
         private RenderGraph _renderGraph;
         private ToonRenderGraphRecorder _renderGraphRecorder;
         private ContextContainer _contextContainer;
-        
+
         private RTHandle _currentBackbuffer;
 
         public ToonRenderPipeline(ToonRPAsset asset)
@@ -51,16 +50,14 @@ namespace ToonRP
             _renderGraph = null;
             _contextContainer?.Dispose();
             _renderGraphRecorder = null;
-            
             _currentBackbuffer?.Release();
         }
 
         protected override void Render(ScriptableRenderContext context, List<Camera> cameras)
         {
-            
             BeginContextRendering(context, cameras);
 
-            foreach (var camera in cameras.Where(camera => camera.enabled))
+            foreach (var camera in cameras)
             {
                 RenderCamera(context, camera);
             }
@@ -85,7 +82,6 @@ namespace ToonRP
             context.SetupCameraProperties(camera);
             
             RTHandles.SetReferenceSize(camera.pixelWidth, camera.pixelHeight);
-            _currentBackbuffer ??= RTHandles.Alloc(BuiltinRenderTextureType.CameraTarget, "BackBuffer Color");
             
             RecordAndExecuteRenderGraph(context, camera, cmd);
             
@@ -107,6 +103,30 @@ namespace ToonRP
             cameraData.Camera = camera;
             cameraData.CullingResults = cullingResults;
             
+            var lightingData = _contextContainer.GetOrCreate<LightingData>();
+    
+            lightingData.Reset();
+            lightingData.MainLightDirection = new Vector4(0, 0, 1, 0);
+            lightingData.MainLightColor = Color.black;
+
+            var visibleLights = cullingResults.visibleLights;
+            var mainLightIndex = -1;
+    
+            for (var i = 0; i < visibleLights.Length; i++)
+            {
+                if (visibleLights[i].lightType != LightType.Directional) continue;
+                mainLightIndex = i;
+                break;
+            }
+
+            if (mainLightIndex == -1) return true;
+            var mainLight = visibleLights[mainLightIndex];
+        
+            var dir = -mainLight.localToWorldMatrix.GetColumn(2);
+            lightingData.MainLightDirection = new Vector4(dir.x, dir.y, dir.z, 0);
+        
+            lightingData.MainLightColor = mainLight.finalColor;
+
             return true;
         }
 
@@ -151,6 +171,18 @@ namespace ToonRP
                 format = backBufferFormat,
                 bindMS = false
             };
+
+            var targetTexture = camera.targetTexture;
+            var isBuildInTexture = targetTexture == null;
+            
+            var targetColorId = isBuildInTexture
+                ? BuiltinRenderTextureType.CameraTarget
+                : new RenderTargetIdentifier(targetTexture);
+
+            if (_currentBackbuffer == null)
+                _currentBackbuffer = RTHandles.Alloc(targetColorId, "BackBuffer Color");
+            else if (_currentBackbuffer.nameID != targetColorId)
+                RTHandleStaticHelpers.SetRTHandleUserManagedWrapper(ref _currentBackbuffer, targetColorId);
             
             resources.BackBufferColor = renderGraph.ImportTexture(_currentBackbuffer, importInfo);
 

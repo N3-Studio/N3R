@@ -15,10 +15,12 @@ namespace ToonRP
         internal class BlitPassData
         {
             public TextureHandle ColorTextureHandle;
+            public bool NeedFlip;
         }
 
         private static void AddBlitPass(RenderGraph renderGraph, ContextContainer frameData)
         {
+            var cameraData = frameData.Get<CameraData>();
             var resourceData = frameData.Get<ResourceData>();
 
             using var builder = renderGraph.AddRasterRenderPass<BlitPassData>("Blit Pass", out var passData,
@@ -27,6 +29,8 @@ namespace ToonRP
             builder.SetRenderAttachment(resourceData.BackBufferColor, 0);
 
             passData.ColorTextureHandle = resourceData.ColorTexture;
+            passData.NeedFlip = SystemInfo.graphicsUVStartsAtTop && cameraData.Camera.cameraType is not (CameraType
+                .SceneView or CameraType.Preview);
             
             builder.UseTexture(passData.ColorTextureHandle);
             
@@ -36,10 +40,8 @@ namespace ToonRP
             {
                 context.cmd.SetGlobalTexture(Shader.PropertyToID("_BlitTexture"), data.ColorTextureHandle);
                 var scaleBias = new Vector4(1, 1, 0, 0);
-
-                var needFlip = SystemInfo.graphicsUVStartsAtTop;
     
-                if (needFlip)
+                if (passData.NeedFlip)
                 {
                     scaleBias = new Vector4(1, -1, 0, 1);
                 }

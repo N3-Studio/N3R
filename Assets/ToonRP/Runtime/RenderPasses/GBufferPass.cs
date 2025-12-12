@@ -30,7 +30,7 @@ namespace ToonRP
                 builder.SetRenderAttachment(resourceData.GBuffer[i], i);
             }
             
-            // builder.SetRenderAttachmentDepth(resourceData.DepthTexture);
+            builder.SetRenderAttachmentDepth(resourceData.DepthTexture);
             
             var rendererListDesc = new RendererListDesc(GBufferPassShaderTagId, cameraData.CullingResults, cameraData.Camera)
             {

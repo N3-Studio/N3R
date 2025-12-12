@@ -23,9 +23,8 @@ struct GBufferOutput
 Varyings Vert(Attributes input)
 {
     Varyings output;
-
-    output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-
+    
+    
     return output;
 }
 
@@ -33,10 +32,7 @@ GBufferOutput Frag(Varyings input)
 {
     GBufferOutput output;
     
-    output.gBuffer0 = half4(1, 1, 1, 1);
-    output.gBuffer1 = half4(1, 1, 1, 1);
-    output.gBuffer2 = half4(1, 1, 1, 1);
-    output.gBuffer3 = half4(1, 1, 1, 1);
     
+
     return output;
 }

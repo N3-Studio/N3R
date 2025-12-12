@@ -1,5 +1,4 @@
 ﻿using ToonRP.FrameData;
-using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RendererUtils;
 using UnityEngine.Rendering.RenderGraphModule;

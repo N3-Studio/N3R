@@ -7,9 +7,10 @@ namespace ToonRP
     {
         public void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            AddSkyboxPass(renderGraph, frameData);
             AddDepthOnlyPass(renderGraph, frameData);
+            AddSkyboxPass(renderGraph, frameData);
             AddGBufferPass(renderGraph, frameData);
+            AddLightingPass(renderGraph, frameData);
             AddBlitPass(renderGraph, frameData);
         }
     }

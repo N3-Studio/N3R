@@ -2,6 +2,7 @@ Shader "ToonRP/Lit"
 {
     Properties
     {
+        
     }
 
     SubShader
@@ -32,13 +33,29 @@ Shader "ToonRP/Lit"
             Tags { "LightMode" = "GBuffer" }
             
             ZWrite Off
-            ZTest Equal
+            ZTest LEqual
             
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment Frag
             
             #include "GBufferPass.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "Lighting"
+            Tags { "LightMode" = "Lighting" }
+            
+            ZWrite Off
+            ZTest Always
+            
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Frag
+            
+            #include "LightingPass.hlsl"
             ENDHLSL
         }
     }
